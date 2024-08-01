@@ -45,5 +45,4 @@ jspm_packages/
 .DS_Store
 
 # To avoid uploading test build artifacts
-dist/
 .gild/
