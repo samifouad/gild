@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 import { Command } from 'commander'
-import { $ } from 'bun'
 import * as core from './core/index'
 
 const program = new Command()
@@ -11,10 +10,10 @@ program
     .description('https://gild.gg')
   
 program
-    .command('init')
+    .command('new')
     .description('create a new .gild folder')
     .action(async () => {
-        console.log('init')
+        await core.init()
     })
 
 program

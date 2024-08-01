@@ -27,8 +27,8 @@ export async function check() {
         gf_spinner.error()
     }
 
-    const gc_spinner = createSpinner('does gild.toml file exist?').start();
-    const { exitCode: gc_exitCode } = await $`du -sh ./.gild/gild.toml`.nothrow().quiet()
+    const gc_spinner = createSpinner('does infra.toml file exist?').start();
+    const { exitCode: gc_exitCode } = await $`du -sh ./.gild/infra.toml`.nothrow().quiet()
 
     if (gc_exitCode === 0) {
         gc_spinner.success()
@@ -36,9 +36,9 @@ export async function check() {
         gc_spinner.error()
     }
 
-    const gt_spinner = createSpinner('is gild.toml file valid?').start();
+    const gt_spinner = createSpinner('is infra.toml file valid?').start();
     try {
-        const path = './.gild/gild.toml'
+        const path = './.gild/infra.toml'
         const file = Bun.file(path)
         const gtoml = await file.text();
         const data = load(gtoml)

@@ -1,6 +1,6 @@
 {
-  "name": "gild-agent",
-  "version": "0.1.0",
+  "name": "gild-cli",
+  "version": "0.2.0",
   "module": "index.ts",
   "type": "module",
   "scripts": {
