@@ -1,0 +1,37 @@
+{
+    "name": "gild",
+    "description": "infrastructure as code",
+    "bin": {
+      "gild": "./bin.js"
+    },
+    "repository": "https://github.com/samifouad/gild-cli",
+    "homepage": "https://gild.gg",
+    "keywords": [
+      "gild",
+      "cli",
+      "infra",
+      "infrastructure as code",
+      "infra as code",
+      "backend",
+      "fullstack",
+      "full stack",
+      "devops",
+      "dev ops",
+      "incus",
+      "linkhash",
+      "gleam",
+      "sami",
+      "samifouad",
+      "fromafrica",
+      "from africa",
+      "from africa with love"
+    ],
+    "author": "Sami Fouad - @fromafrica",
+    "license": "Apache-2.0",
+    "optionalDependencies": {
+      "@samifouad/gild-darwin-arm64": "*",
+      "@samifouad/gild-darwin-x64": "*",
+      "@samifouad/gild-linux-x64": "*",
+      "@samifouad/gild-windows-x64": "*"
+    }
+  }

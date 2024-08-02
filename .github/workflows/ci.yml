@@ -1,0 +1,272 @@
+name: build & publish on supported platforms
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+            bun-version: latest
+
+      - name: install dependencies
+        run: bun install
+
+      - name: build binary
+        run: bun run make
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_linux-x64
+          path: /home/runner/work/gild-cli/gild-cli/dist/gild
+
+  windows-x64:
+    runs-on: windows-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: bun install
+
+      - name: build binary
+        run: bun run make
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_windows-x64
+          path: D:/a/gild-cli/gild-cli/dist/gild.exe
+
+  darwin-x64:
+    runs-on: macOS-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: bun install
+
+      - name: build binary # not using "make" script to be sure target is correct
+        run: bun build ./index.ts --compile --target=bun-darwin-x64 --outfile dist/gild
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_darwin-x64
+          path: /Users/runner/work/gild-cli/gild-cli/dist/gild
+
+  darwin-arm64:
+    runs-on: macOS-latest 
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: bun install
+
+      - name: build binary # not using "make" script to be sure target is correct
+        run: bun build ./index.ts --compile --target=bun-darwin-arm64 --outfile dist/gild
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_arm64-x64
+          path: /Users/runner/work/gild-cli/gild-cli/dist/gild
+
+  publish-linux-x64-to-npm:
+    needs: [linux-x64, windows-x64, darwin-x64, darwin-arm64]
+    runs-on: ubuntu-latest      
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CURRENT_TAG: ${{ github.ref_name }}
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Install jq
+        shell: bash
+        run: |
+          sudo apt-get install jq -y
+
+      - name: Prepare linux-x64's package.json and copy binary artifact
+        shell: bash
+        run: |
+          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-linux-x64/package.json > npm/gild-linux-x64-musl/package.tmp.json && mv npm/gild-linux-x64-musl/package.tmp.json npm/gild-linux-x64-musl/package.json
+          cp gild_${{ env.CURRENT_TAG }}_linux-x64/gild npm/linux-x64/gild
+
+      - name: Configure npm & publish
+        run: |
+          cd npm/gild-linux-x64
+          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > .npmrc
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
+  publish-windows-x64-to-npm:
+    needs: [publish-linux-x64-to-npm]
+    runs-on: ubuntu-latest      
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CURRENT_TAG: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Install jq
+        shell: bash
+        run: |
+          sudo apt-get install jq -y
+
+      - name: Prepare gild-windows-x64's package.json and copy binary artifact
+        shell: bash
+        run: |
+          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-windows-x64/package.json > npm/gild-windows-x64/package.tmp.json && mv npm/gild-windows-x64/package.tmp.json npm/gild-windows-x64/package.json
+          cp gild_${{ env.CURRENT_TAG }}_windows-x86/gild.exe npm/gild-windows-x64/gild.exe
+
+      - name: Configure npm & publish
+        run: |
+          cd npm/gild-windows-x64
+          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > .npmrc
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-darwin-x64-to-npm:
+    needs: [publish-windows-x64-to-npm]
+    runs-on: ubuntu-latest      
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CURRENT_TAG: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Install jq
+        shell: bash
+        run: |
+          sudo apt-get install jq -y
+
+      - name: Prepare gild-darwin-x64's package.json and copy binary artifact
+        shell: bash
+        run: |
+          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-darwin-x64/package.json > npm/gild-darwin-x64/package.tmp.json && mv npm/gild-darwin-x64/package.tmp.json npm/gild-darwin-x64/package.json
+          cp gild_${{ env.CURRENT_TAG }}_darwin-x64/gild npm/gild-darwin-x64/gild
+
+      - name: Configure npm & publish
+        run: |
+          cd npm/gild-darwin-x64
+          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > .npmrc
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-darwin-arm64-to-npm:
+    needs: [publish-darwin-x64-to-npm]
+    runs-on: ubuntu-latest      
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CURRENT_TAG: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Install jq
+        shell: bash
+        run: |
+          sudo apt-get install jq -y
+
+      - name: Prepare gild-darwin-arm64's package.json and copy binary artifact
+        shell: bash
+        run: |
+          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-darwin-arm64/package.json > npm/gild-darwin-arm64/package.tmp.json && mv npm/gild-darwin-arm64/package.tmp.json npm/gild-darwin-arm64/package.json
+          cp gild_${{ env.CURRENT_TAG }}_darwin-arm64/gild npm/gild-darwin-arm64/gild
+
+      - name: Configure npm & publish
+        run: |
+          cd npm/gild-darwin-arm64
+          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > .npmrc
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-main-to-npm:
+    needs: [publish-windows-x64-to-npm, publish-linux-x64-to-npm, publish-darwin-x64-to-npm, publish-darwin-arm64-to-npm]
+    runs-on: ubuntu-latest      
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      CURRENT_TAG: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Install jq
+        shell: bash
+        run: |
+          sudo apt-get install jq -y
+
+      - name: Prepare package.json
+        shell: bash
+        run: |
+          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild/package.json > npm/gild/package.tmp.json && mv npm/gild/package.tmp.json npm/gild/package.json
+
+      - name: Configure npm & publish
+        run: |
+          cd npm/gild
+          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > .npmrc
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
