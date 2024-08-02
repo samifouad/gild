@@ -19,11 +19,9 @@ jobs:
         with:
             bun-version: latest
 
-      - name: change directory
-        run: cd /home/runner/work/gild-cli/gild-cli/main
-
       - name: install dependencies
-        run: bun install
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun install
 
       - name: build binary
         run: bun run make
@@ -47,11 +45,10 @@ jobs:
         with:
           bun-version: latest
 
-      - name: change directory
-        run: cd D:/a/gild-cli/gild-cli/main
-
       - name: install dependencies
-        run: bun install
+        run: |
+          cd D:/a/gild-cli/gild-cli/main
+          bun install
 
       - name: build binary
         run: bun run make
@@ -75,11 +72,10 @@ jobs:
         with:
           bun-version: latest
 
-      - name: change directory
-        run: cd /Users/runner/work/gild-cli/gild-cli/main
-
       - name: install dependencies
-        run: bun install
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun install
 
       - name: build binary # not using "make" script to be sure target is correct
         run: bun build ./index.ts --compile --target=bun-darwin-x64 --outfile dist/gild
@@ -103,11 +99,10 @@ jobs:
         with:
           bun-version: latest
 
-      - name: change directory
-        run: cd /Users/runner/work/gild-cli/gild-cli/main
-
       - name: install dependencies
-        run: bun install
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun install
 
       - name: build binary # not using "make" script to be sure target is correct
         run: bun build ./index.ts --compile --target=bun-darwin-arm64 --outfile dist/gild
