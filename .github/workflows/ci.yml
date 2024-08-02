@@ -19,6 +19,9 @@ jobs:
         with:
             bun-version: latest
 
+      - name: change directory
+        run: cd /home/runner/work/gild-cli/gild-cli/main
+
       - name: install dependencies
         run: bun install
 
@@ -29,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gild-cli_${{ github.ref_name }}_linux-x64
-          path: /home/runner/work/gild-cli/gild-cli/dist/gild
+          path: /home/runner/work/gild-cli/gild-cli/main/dist/gild
 
   windows-x64:
     runs-on: windows-latest
@@ -44,6 +47,9 @@ jobs:
         with:
           bun-version: latest
 
+      - name: change directory
+        run: cd D:/a/gild-cli/gild-cli/main
+
       - name: install dependencies
         run: bun install
 
@@ -54,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gild-cli_${{ github.ref_name }}_windows-x64
-          path: D:/a/gild-cli/gild-cli/dist/gild.exe
+          path: D:/a/gild-cli/gild-cli/main/dist/gild.exe
 
   darwin-x64:
     runs-on: macOS-latest
@@ -69,6 +75,9 @@ jobs:
         with:
           bun-version: latest
 
+      - name: change directory
+        run: cd /Users/runner/work/gild-cli/gild-cli/main
+
       - name: install dependencies
         run: bun install
 
@@ -79,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gild-cli_${{ github.ref_name }}_darwin-x64
-          path: /Users/runner/work/gild-cli/gild-cli/dist/gild
+          path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
   darwin-arm64:
     runs-on: macOS-latest 
@@ -94,6 +103,9 @@ jobs:
         with:
           bun-version: latest
 
+      - name: change directory
+        run: cd /Users/runner/work/gild-cli/gild-cli/main
+
       - name: install dependencies
         run: bun install
 
@@ -104,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gild-cli_${{ github.ref_name }}_arm64-x64
-          path: /Users/runner/work/gild-cli/gild-cli/dist/gild
+          path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
   publish-linux-x64-to-npm:
     needs: [linux-x64, windows-x64, darwin-x64, darwin-arm64]
