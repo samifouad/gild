@@ -121,7 +121,7 @@ jobs:
           path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
   publish-linux-x64-to-npm:
-    needs: [linux-x64, windows-x64, darwin-x64, darwin-arm64]
+    needs: [linux-x64]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -133,6 +133,11 @@ jobs:
 
       - name: download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          name: gild_${{ env.CURRENT_TAG }}_linux-x64
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Install jq
         shell: bash
@@ -155,7 +160,7 @@ jobs:
 
 
   publish-windows-x64-to-npm:
-    needs: [publish-linux-x64-to-npm]
+    needs: [windows-x64]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -167,6 +172,11 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          name: gild_${{ env.CURRENT_TAG }}_windows-x64.exe
+
+      - name: Display structure of downloaded files
+        run: dir /s
 
       - name: Install jq
         shell: bash
@@ -177,7 +187,7 @@ jobs:
         shell: bash
         run: |
           jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-windows-x64/package.json > npm/gild-windows-x64/package.tmp.json && mv npm/gild-windows-x64/package.tmp.json npm/gild-windows-x64/package.json
-          cp gild_${{ env.CURRENT_TAG }}_windows-x86/gild.exe npm/gild-windows-x64/gild.exe
+          cp gild_${{ env.CURRENT_TAG }}_windows-x64/gild.exe npm/gild-windows-x64/gild.exe
 
       - name: Configure npm & publish
         run: |
@@ -188,7 +198,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-x64-to-npm:
-    needs: [publish-windows-x64-to-npm]
+    needs: [darwin-x64]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -200,6 +210,11 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          name: gild_${{ env.CURRENT_TAG }}_darwin-x64
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Install jq
         shell: bash
@@ -221,7 +236,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-arm64-to-npm:
-    needs: [publish-darwin-x64-to-npm]
+    needs: [darwin-x64]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -233,6 +248,11 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          name: gild_${{ env.CURRENT_TAG }}_darwin-arm64
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Install jq
         shell: bash
