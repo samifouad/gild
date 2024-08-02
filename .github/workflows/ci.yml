@@ -24,7 +24,8 @@ jobs:
           cd /home/runner/work/gild-cli/gild-cli/main && bun install
 
       - name: build binary
-        run: bun run make
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun run make
 
       - name: upload to github releases
         uses: actions/upload-artifact@v4
@@ -51,7 +52,9 @@ jobs:
           bun install
 
       - name: build binary
-        run: bun run make
+        run: |
+          cd D:/a/gild-cli/gild-cli/main
+          bun run make
 
       - name: upload to github releases
         uses: actions/upload-artifact@v4
@@ -78,7 +81,9 @@ jobs:
           bun install
 
       - name: build binary # not using "make" script to be sure target is correct
-        run: bun build ./index.ts --compile --target=bun-darwin-x64 --outfile dist/gild
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun build ./index.ts --compile --target=bun-darwin-x64 --outfile dist/gild
 
       - name: upload to github releases
         uses: actions/upload-artifact@v4
@@ -105,7 +110,9 @@ jobs:
           bun install
 
       - name: build binary # not using "make" script to be sure target is correct
-        run: bun build ./index.ts --compile --target=bun-darwin-arm64 --outfile dist/gild
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun build ./index.ts --compile --target=bun-darwin-arm64 --outfile dist/gild
 
       - name: upload to github releases
         uses: actions/upload-artifact@v4
