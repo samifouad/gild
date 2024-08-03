@@ -133,8 +133,8 @@ jobs:
 
       - name: download all artifacts
         uses: actions/download-artifact@v4
-        # with:
-        #   name: gild_${{ env.CURRENT_TAG }}_linux-x64
+        with:
+          name: ./gild-cli_${{ env.CURRENT_TAG }}_linux-x64/gild
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -147,10 +147,10 @@ jobs:
       - name: Prepare linux-x64's package.json and copy binary artifact
         shell: bash
         run: |
-          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-linux-x64/package.json > npm/gild-linux-x64-musl/package.tmp.json && mv npm/gild-linux-x64-musl/package.tmp.json npm/gild-linux-x64-musl/package.json
-          cp gild-cli_${{ env.CURRENT_TAG }}_linux-x64/gild npm/linux-x64/gild
+          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-linux-x64/package.json > npm/gild-linux-x64/package.tmp.json && mv npm/gild-linux-x64/package.tmp.json npm/gild-linux-x64/package.json
+          cp ./gild-cli_${{ env.CURRENT_TAG }}_linux-x64/gild npm/gild-linux-x64/gild
 
-      - name: Configure npm & publish
+      - name: configure npm & publish
         run: |
           cd npm/gild-linux-x64
           echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > .npmrc
@@ -172,8 +172,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        # with:
-        #   name: gild_${{ env.CURRENT_TAG }}_windows-x64.exe
+        with:
+          name: ./gild_${{ env.CURRENT_TAG }}_windows-x64/gild.exe
 
       - name: Display structure of downloaded files
         run: dir /s
@@ -210,8 +210,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        # with:
-        #   name: gild-cli_${{ env.CURRENT_TAG }}_darwin-x64
+        with:
+          name: ./gild-cli_${{ env.CURRENT_TAG }}_darwin-x64/gild
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -225,7 +225,7 @@ jobs:
         shell: bash
         run: |
           jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-darwin-x64/package.json > npm/gild-darwin-x64/package.tmp.json && mv npm/gild-darwin-x64/package.tmp.json npm/gild-darwin-x64/package.json
-          cp gild-cli_${{ env.CURRENT_TAG }}_darwin-x64/gild npm/gild-darwin-x64/gild
+          cp ./gild-cli_${{ env.CURRENT_TAG }}_darwin-x64/gild npm/gild-darwin-x64/gild
 
       - name: Configure npm & publish
         run: |
@@ -248,8 +248,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        # with:
-        #   name: gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64
+        with:
+          name: ./gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64/gild
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -263,7 +263,7 @@ jobs:
         shell: bash
         run: |
           jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-darwin-arm64/package.json > npm/gild-darwin-arm64/package.tmp.json && mv npm/gild-darwin-arm64/package.tmp.json npm/gild-darwin-arm64/package.json
-          cp gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64/gild npm/gild-darwin-arm64/gild
+          cp ./gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64/gild npm/gild-darwin-arm64/gild
 
       - name: Configure npm & publish
         run: |
