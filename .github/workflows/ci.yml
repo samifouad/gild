@@ -133,8 +133,6 @@ jobs:
 
       - name: download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: ./gild-cli_${{ env.CURRENT_TAG }}_linux-x64/gild
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -172,8 +170,6 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: ./gild_${{ env.CURRENT_TAG }}_windows-x64/gild.exe
 
       - name: Display structure of downloaded files
         run: dir /s
@@ -210,8 +206,6 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: ./gild-cli_${{ env.CURRENT_TAG }}_darwin-x64/gild
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -248,8 +242,6 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: ./gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64/gild
 
       - name: Display structure of downloaded files
         run: ls -R

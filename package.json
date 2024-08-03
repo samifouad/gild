@@ -1,6 +1,6 @@
 {
   "name": "gild-cli",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "module": "index.ts",
   "type": "module",
   "scripts": {
