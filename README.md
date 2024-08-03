@@ -1,15 +1,26 @@
-# gild-agent
+# gild-cli
 
-To install dependencies:
+documentation coming soon to [gild.gg](https://gild.gg)
 
-```bash
-bun install
-```
+## installation
+install with [npm](https://npmjs.com): ```npm install -g @samifouad/gild```
 
-To run:
+install with [bun](https://bun.sh): ```bun add -g @samifouad/gild```
 
-```bash
-bun run index.ts
-```
+if don't have a javascript package manager installed, see below for a method that will work for your OS
 
-This project was created using `bun init` in bun v1.1.13. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## [homebrew](https://brew.sh) for macOS &amp; linux
+
+first run: ```brew tap samifouad/gild```
+
+then run: ```brew install gild```
+
+## [scoop](https://scoop.sh) for windows
+
+support is planned &amp; coming soon
+
+## dependencies
+
+gild requires a recent version of [incus](https://linuxcontainers.org/incus/) installed. if you use homebrew, it will be automatically installed when you run the install command. otherwise check out the incus website for [installation instructions](https://linuxcontainers.org/incus/docs/main/installing/#installing-from-package).
+
+there are no other dependencies.
