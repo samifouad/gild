@@ -1,5 +1,5 @@
 {
-    "name": "@fromafrica/gild-darwin-x64",
+    "name": "@samifouad/gild-darwin-x64",
     "description": "gild's darwin-x64",
     "main": "gild",
     "bin": {

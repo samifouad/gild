@@ -117,7 +117,7 @@ jobs:
       - name: upload to github releases
         uses: actions/upload-artifact@v4
         with:
-          name: gild-cli_${{ github.ref_name }}_arm64-x64
+          name: gild-cli_${{ github.ref_name }}_darwin-arm64
           path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
   publish-linux-x64-to-npm:
@@ -156,7 +156,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-
   publish-windows-x64-to-npm:
     needs: [windows-x64]
     runs-on: ubuntu-latest      
@@ -171,8 +170,8 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
-      - name: Display structure of downloaded files
-        run: dir /s
+      # - name: Display structure of downloaded files
+      #   run: dir /s
 
       - name: Install jq
         shell: bash
@@ -255,7 +254,7 @@ jobs:
         shell: bash
         run: |
           jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-darwin-arm64/package.json > npm/gild-darwin-arm64/package.tmp.json && mv npm/gild-darwin-arm64/package.tmp.json npm/gild-darwin-arm64/package.json
-          cp ./gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64/gild npm/gild-darwin-arm64/gild
+          cp gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64/gild npm/gild-darwin-arm64/gild
 
       - name: Configure npm & publish
         run: |
