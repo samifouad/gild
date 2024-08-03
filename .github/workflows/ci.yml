@@ -133,8 +133,8 @@ jobs:
 
       - name: download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: gild_${{ env.CURRENT_TAG }}_linux-x64
+        # with:
+        #   name: gild_${{ env.CURRENT_TAG }}_linux-x64
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -148,7 +148,7 @@ jobs:
         shell: bash
         run: |
           jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-linux-x64/package.json > npm/gild-linux-x64-musl/package.tmp.json && mv npm/gild-linux-x64-musl/package.tmp.json npm/gild-linux-x64-musl/package.json
-          cp gild_${{ env.CURRENT_TAG }}_linux-x64/gild npm/linux-x64/gild
+          cp gild-cli_${{ env.CURRENT_TAG }}_linux-x64/gild npm/linux-x64/gild
 
       - name: Configure npm & publish
         run: |
@@ -172,8 +172,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: gild_${{ env.CURRENT_TAG }}_windows-x64.exe
+        # with:
+        #   name: gild_${{ env.CURRENT_TAG }}_windows-x64.exe
 
       - name: Display structure of downloaded files
         run: dir /s
@@ -187,7 +187,7 @@ jobs:
         shell: bash
         run: |
           jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" npm/gild-windows-x64/package.json > npm/gild-windows-x64/package.tmp.json && mv npm/gild-windows-x64/package.tmp.json npm/gild-windows-x64/package.json
-          cp gild_${{ env.CURRENT_TAG }}_windows-x64/gild.exe npm/gild-windows-x64/gild.exe
+          cp gild-cli_${{ env.CURRENT_TAG }}_windows-x64/gild.exe npm/gild-windows-x64/gild.exe
 
       - name: Configure npm & publish
         run: |
@@ -210,8 +210,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: gild-cli_${{ env.CURRENT_TAG }}_darwin-x64
+        # with:
+        #   name: gild-cli_${{ env.CURRENT_TAG }}_darwin-x64
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -248,8 +248,8 @@ jobs:
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          name: gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64
+        # with:
+        #   name: gild-cli_${{ env.CURRENT_TAG }}_darwin-arm64
 
       - name: Display structure of downloaded files
         run: ls -R
