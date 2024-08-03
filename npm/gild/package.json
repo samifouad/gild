@@ -1,5 +1,5 @@
 {
-    "name": "gild",
+    "name": "@samifouad/gild",
     "description": "infrastructure as code",
     "bin": {
       "gild": "./bin.js"
