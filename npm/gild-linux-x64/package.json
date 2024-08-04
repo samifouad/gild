@@ -1,6 +1,6 @@
 {
     "name": "@samifouad/gild-linux-x64",
-    "description": "gild's linux-x64",
+    "description": "gild's linux-x64 binary. this package is not meant to be installed directly. please see README",
     "main": "gild",
     "bin": {
       "gild": "./gild"
@@ -9,26 +9,7 @@
     "cpu": ["x64"],
     "repository": "https://github.com/samifouad/gild",
     "homepage": "https://gild.gg",
-    "keywords": [
-        "gild",
-        "cli",
-        "infra",
-        "infrastructure as code",
-        "infra as code",
-        "backend",
-        "fullstack",
-        "full stack",
-        "devops",
-        "dev ops",
-        "incus",
-        "linkhash",
-        "gleam",
-        "sami",
-        "samifouad",
-        "fromafrica",
-        "from africa",
-        "from africa with love"
-      ],
+    "keywords": [],
     "author": "Sami Fouad - @fromafrica",
     "license": "Apache-2.0"
   }

@@ -23,6 +23,10 @@ jobs:
         run: |
           cd /home/runner/work/gild-cli/gild-cli/main && bun install
 
+      - name: run tests
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun test --coverage
+
       - name: build binary
         run: |
           cd /home/runner/work/gild-cli/gild-cli/main && bun run make
@@ -50,6 +54,10 @@ jobs:
         run: |
           cd D:/a/gild-cli/gild-cli/main
           bun install
+
+      - name: run tests
+        run: |
+          cd D:/a/gild-cli/gild-cli/main && bun test --coverage
 
       - name: build binary
         run: |
@@ -80,6 +88,11 @@ jobs:
           cd /Users/runner/work/gild-cli/gild-cli/main
           bun install
 
+      - name: run tests
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun test --coverage
+
       - name: build binary # not using "make" script to be sure target is correct
         run: |
           cd /Users/runner/work/gild-cli/gild-cli/main
@@ -109,6 +122,11 @@ jobs:
           cd /Users/runner/work/gild-cli/gild-cli/main
           bun install
 
+      - name: run tests
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun test --coverage
+
       - name: build binary # not using "make" script to be sure target is correct
         run: |
           cd /Users/runner/work/gild-cli/gild-cli/main
@@ -120,8 +138,63 @@ jobs:
           name: gild-cli_${{ github.ref_name }}_darwin-arm64
           path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
+  linux-x64-binary-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+  darwin-x64-binary-test:
+    runs-on: macOS-13 # should default to x64, TODO: might need to specify target some how
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: confirm which arch
+        run: uname -m
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+  darwin-arm64-binary-test:
+    runs-on: macOS-latest # defaults to arm64 as of macOS14
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: confirm which arch
+        run: uname -m
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+  windows-x64-binary-test:
+    runs-on: windows-latest # defaults to 2022, TODO: might be worth tested 2019 also
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: confirm which arch
+        run: wmic cpu get DataWidth
+
+      - name: Display structure of downloaded files
+        run: Get-ChildItem -Recurse
+
+  binary-tests:
+    needs: [linux-x64-binary-test, darwin-x64-binary-test, darwin-arm64-binary-test, windows-x64-binary-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
   publish-linux-x64-to-npm:
-    needs: [linux-x64]
+    needs: [binary-tests]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -157,7 +230,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-windows-x64-to-npm:
-    needs: [windows-x64]
+    needs: [binary-tests]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -193,7 +266,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-x64-to-npm:
-    needs: [darwin-x64]
+    needs: [binary-tests]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -229,7 +302,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-arm64-to-npm:
-    needs: [darwin-arm64]
+    needs: [binary-tests]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
