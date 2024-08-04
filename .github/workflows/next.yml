@@ -6,7 +6,7 @@ on:
       - 'next'
 
 jobs:
-  linux-x64:
+  linux-x64-test:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
