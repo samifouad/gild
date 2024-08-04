@@ -1,0 +1,29 @@
+name: run tests on linux
+
+on:
+  pull_request:
+    branches:
+      - 'next'
+    types: [opened, synchronize, reopened]
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+            bun-version: latest
+
+      - name: install dependencies
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun install
+
+      - name: run tests
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun test --coverage

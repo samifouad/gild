@@ -1,0 +1,198 @@
+name: build & publish on supported platforms
+
+on:
+  push:
+    branches:
+      - 'rc'
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+            bun-version: latest
+
+      - name: install dependencies
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun install
+
+      - name: run tests
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun test --coverage
+
+      - name: build binary
+        run: |
+          cd /home/runner/work/gild-cli/gild-cli/main && bun run make
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_linux-x64
+          path: /home/runner/work/gild-cli/gild-cli/main/dist/gild
+
+  windows-x64:
+    runs-on: windows-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: |
+          cd D:/a/gild-cli/gild-cli/main
+          bun install
+
+      - name: run tests
+        run: |
+          cd D:/a/gild-cli/gild-cli/main && bun test --coverage
+
+      - name: build binary
+        run: |
+          cd D:/a/gild-cli/gild-cli/main
+          bun run make
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_windows-x64
+          path: D:/a/gild-cli/gild-cli/main/dist/gild.exe
+
+  darwin-x64:
+    runs-on: macOS-13
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun install
+
+      - name: run tests
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun test --coverage
+
+      - name: build binary # not using "make" script to be sure target is correct
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun build ./index.ts --compile --target=bun-darwin-x64 --outfile dist/gild
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_darwin-x64
+          path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
+
+  darwin-arm64:
+    runs-on: macOS-latest 
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun install
+
+      - name: run tests
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun test --coverage
+
+      - name: build binary # not using "make" script to be sure target is correct
+        run: |
+          cd /Users/runner/work/gild-cli/gild-cli/main
+          bun build ./index.ts --compile --target=bun-darwin-arm64 --outfile dist/gild
+
+      - name: upload to github releases
+        uses: actions/upload-artifact@v4
+        with:
+          name: gild-cli_${{ github.ref_name }}_darwin-arm64
+          path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
+
+  linux-x64-binary-test:
+    needs: [linux-x64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+  darwin-x64-binary-test:
+    needs: [darwin-x64]
+    runs-on: macOS-13 # should default to x64, TODO: might need to specify target some how
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: confirm which arch
+        run: uname -m
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+  darwin-arm64-binary-test:
+    needs: [darwin-arm64]
+    runs-on: macOS-latest # defaults to arm64 as of macOS14
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: confirm which arch
+        run: uname -m
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+  windows-x64-binary-test:
+    needs: [windows-x64]
+    runs-on: windows-latest # defaults to 2022, TODO: might be worth tested 2019 also
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: confirm which arch
+        run: wmic cpu get DataWidth
+
+      - name: Display structure of downloaded files
+        run: Get-ChildItem -Recurse
+
+  binary-tests-results:
+    needs: [linux-x64-binary-test, darwin-x64-binary-test, darwin-arm64-binary-test, windows-x64-binary-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Display structure of downloaded files
+        run: ls -R

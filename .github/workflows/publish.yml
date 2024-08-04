@@ -2,11 +2,48 @@ name: build & publish on supported platforms
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - 'main'
 
 jobs:
+  verify-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all tags and history
+
+      - name: Get the latest commit SHA
+        id: get_sha
+        run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Check if commit is on main
+        id: check_main
+        run: |
+          # List all branches containing the commit
+          branches=$(git branch --contains ${{ env.COMMIT_SHA }})
+
+          # Check if main is in the list of branches
+          if [[ "$branches" == *"main"* ]]; then
+            echo "commit_on_main=true" >> $GITHUB_ENV
+          else
+            echo "commit_on_main=false" >> $GITHUB_ENV
+          fi
+
+      - name: Exit if not on main
+        if: env.commit_on_main == 'false'
+        run: |
+          echo "This tag's commit is not on the main branch. Exiting workflow."
+          exit 1
+
+      - name: Verify and proceed
+        if: env.commit_on_main == 'true'
+        run: echo "Tag is on main. Proceeding with the workflow..."
+
   linux-x64:
+    needs: [verify-and-run]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -38,6 +75,7 @@ jobs:
           path: /home/runner/work/gild-cli/gild-cli/main/dist/gild
 
   windows-x64:
+    needs: [verify-and-run]
     runs-on: windows-latest
     steps:
       - name: checkout
@@ -71,6 +109,7 @@ jobs:
           path: D:/a/gild-cli/gild-cli/main/dist/gild.exe
 
   darwin-x64:
+    needs: [verify-and-run]
     runs-on: macOS-13
     steps:
       - name: checkout
@@ -105,6 +144,7 @@ jobs:
           path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
   darwin-arm64:
+    needs: [verify-and-run]
     runs-on: macOS-latest 
     steps:
       - name: checkout
