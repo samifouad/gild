@@ -1,4 +1,4 @@
-name: run tests on linux
+name: simple test suite on linux
 
 on:
   push:
