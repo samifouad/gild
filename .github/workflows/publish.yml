@@ -1,4 +1,4 @@
-name: build & publish on supported platforms
+name: build, test & publish on all platforms
 
 on:
   push:
