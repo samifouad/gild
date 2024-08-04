@@ -1,0 +1,29 @@
+name: simple test suite on linux
+
+on:
+  push:
+    branches:
+      - 'next-windows'
+
+jobs:
+  windows-x64-test:
+    runs-on: windows-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: install dependencies
+        run: |
+          cd D:/a/gild-cli/gild-cli/main
+          bun install
+
+      - name: run tests
+        run: |
+          cd D:/a/gild-cli/gild-cli/main && bun test --coverage
