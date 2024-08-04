@@ -1,10 +1,9 @@
 name: run tests on linux
 
 on:
-  pull_request:
+  push:
     branches:
       - 'next'
-    types: [opened, synchronize, reopened]
 
 jobs:
   linux-x64:
