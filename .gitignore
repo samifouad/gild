@@ -46,4 +46,3 @@ jspm_packages/
 
 # To avoid uploading test build artifacts
 .gild/
-.gildtest/

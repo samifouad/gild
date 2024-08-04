@@ -71,7 +71,7 @@ jobs:
           path: D:/a/gild-cli/gild-cli/main/dist/gild.exe
 
   darwin-x64:
-    runs-on: macOS-latest
+    runs-on: macOS-13
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -139,6 +139,7 @@ jobs:
           path: /Users/runner/work/gild-cli/gild-cli/main/dist/gild
 
   linux-x64-binary-test:
+    needs: [linux-x64]
     runs-on: ubuntu-latest
     steps:
       - name: download all artifacts
@@ -148,6 +149,7 @@ jobs:
         run: ls -R
 
   darwin-x64-binary-test:
+    needs: [darwin-x64]
     runs-on: macOS-13 # should default to x64, TODO: might need to specify target some how
     steps:
       - name: download all artifacts
@@ -160,6 +162,7 @@ jobs:
         run: ls -R
 
   darwin-arm64-binary-test:
+    needs: [darwin-arm64]
     runs-on: macOS-latest # defaults to arm64 as of macOS14
     steps:
       - name: download all artifacts
@@ -172,6 +175,7 @@ jobs:
         run: ls -R
 
   windows-x64-binary-test:
+    needs: [windows-x64]
     runs-on: windows-latest # defaults to 2022, TODO: might be worth tested 2019 also
     steps:
       - name: download all artifacts
