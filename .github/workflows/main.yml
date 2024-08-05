@@ -298,7 +298,13 @@ jobs:
         with:
           repository: samifouad/homebrew-gild
           token: ${{ secrets.GH_TOKEN }}
-          ref: main  
+          ref: main
+          path: homebrew-gild
+
+      - name: checkout gild-cli repo
+        uses: actions/checkout@v4
+        with:
+          path: gild-cli
 
       - name: Display structure of downloaded files
         run: ls -R
