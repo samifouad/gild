@@ -340,11 +340,11 @@ jobs:
           # Use jq to update or create JSON file
           echo '{}' | jq \
             --arg linux_x64_url "https://github.com/samifouad/gild-cli/releases/download/${{ github.ref_name }}/gild_cli_${{ github.ref_name }}_linux_x64.tar.gz" \
-            --arg linux_x64_hash "${{ env.LINUX_X64_SHA256 }}" \
+            --arg linux_x64_hash "${{ env.LINUX-X64_SHA256 }}" \
             --arg darwin_arm64_url "https://github.com/samifouad/gild-cli/releases/download/${{ github.ref_name }}/gild_cli_${{ github.ref_name }}_darwin_arm64.tar.gz" \
-            --arg darwin_arm64_hash "${{ env.DARWIN_ARM64_SHA256 }}" \
+            --arg darwin_arm64_hash "${{ env.DARWIN-ARM64_SHA256 }}" \
             --arg darwin_x64_url "https://github.com/samifouad/gild-cli/releases/download/${{ github.ref_name }}/gild_cli_${{ github.ref_name }}_darwin_x64.tar.gz" \
-            --arg darwin_x64_hash "${{ env.DARWIN_X64_SHA256 }}" \
+            --arg darwin_x64_hash "${{ env.DARWIN-X64_SHA256 }}" \
             --arg version "${{ github.ref_name }}" \
             '. + {
               linux_x64_url: $linux_x64_url,
