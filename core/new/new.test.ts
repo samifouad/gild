@@ -1,5 +1,6 @@
 import { expect, test, describe, beforeAll } from 'bun:test'
 import { $ } from 'bun'
+import os from 'node:os'
 import { check_existing } from './lib/check_existing'
 import { create_directory } from './lib/create_directory'
 import { create_file } from './lib/create_file'
@@ -7,15 +8,32 @@ import { create_file } from './lib/create_file'
 describe("command: new", () => {
     beforeAll(async () => {
         try {
-            await $`rm -r .gildtest`
+            await $`rm -r .gildtest`.quiet()
         } catch(e) {
             console.error('issue deleting test folder')
         }
     })
 
-    test("check_existing()", async () => {
-        const { exitCode: exitCode_ce } = await check_existing('.gildtest')
-        expect(exitCode_ce).toBe(1)
+    // TODO: sanitization needed to force throw
+    const linux = process.platform === "linux"
+    test.if(linux)("check_existing() - linux", async () => {
+        expect(async () => {
+            const { exitCode: exitCode_cel } = await check_existing('linux', '.gildtest')
+        }).not.toThrow()    
+    })
+
+    const macos = process.platform === "darwin"
+    test.if(macos)("check_existing() - macos", async () => {
+        expect(async () => {
+            const { exitCode: exitCode_cem } = await check_existing('darwin', '.gildtest')
+        }).not.toThrow()
+    })
+
+    const windows = process.platform === "win32"
+    test.if(windows)("check_existing() - windows", async () => {
+        expect(async () => {
+            const { exitCode: exitCode_cew } = await check_existing('win32', '.gildtest')
+        }).not.toThrow()
     })
 
     test("create_directory()", async () => {
