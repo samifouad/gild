@@ -2,8 +2,8 @@ name: build, test & publish on all platforms
 
 on:
   push:
-    branches:
-      - 'main'
+    tags:
+      - '*'
 
 jobs:
   verify-and-run:
