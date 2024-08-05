@@ -278,7 +278,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           files: |
             gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz
             gild-cli_${{ github.ref_name }}_darwin-arm64.txt
