@@ -1,4 +1,4 @@
-name: simple test suite on linux
+name: simple test suite on macOS
 
 on:
   push:
