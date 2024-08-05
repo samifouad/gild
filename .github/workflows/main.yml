@@ -237,8 +237,56 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-  publish-linux-x64-to-npm:
+  publish-gh-release:
     needs: [binary-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: release commit hash
+        run: echo ${{ github.sha }} > release.txt
+
+      - name: tarball for linux-x64
+        run: tar -czf gild-cli_${{ github.ref_name }}_linux-x64.tar.gz gild-cli_${{ github.ref_name }}_linux-x64/gild
+
+      - name: sha256 for linux-x64
+        run: shasum -a 256 gild-cli_${{ github.ref_name }}_linux-x64.tar.gz > gild-cli_${{ github.ref_name }}_linux-x64.txt
+
+      - name: tarball for darwin-arm64
+        run: tar -czf gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz gild-cli_${{ github.ref_name }}_darwin-arm64/gild
+
+      - name: sha256 for darwin-arm64
+        run: shasum -a 256 gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz > gild-cli_${{ github.ref_name }}_darwin-arm64.txt
+
+      - name: tarball for darwin-x64
+        run: tar -czf gild-cli_${{ github.ref_name }}_darwin-x64.tar.gz gild-cli_${{ github.ref_name }}_darwin-x64/gild
+
+      - name: sha256 for darwin-x64
+        run: shasum -a 256 gild-cli_${{ github.ref_name }}_darwin-x64.tar.gz > gild-cli_${{ github.ref_name }}_darwin-x64.txt
+
+      - name: tarball for windows-x64
+        run: tar -czf gild-cli_${{ github.ref_name }}_windows-x64.tar.gz gild-cli_${{ github.ref_name }}_windows-x64/gild.exe
+
+      - name: sha256 for windows-x64
+        run: shasum -a 256 gild-cli_${{ github.ref_name }}_windows-x64.tar.gz > gild-cli_${{ github.ref_name }}_windows-x64.txt
+      
+      - name: release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz
+            gild-cli_${{ github.ref_name }}_darwin-arm64.txt
+            gild-cli_${{ github.ref_name }}_darwin-x64.tar.gz
+            gild-cli_${{ github.ref_name }}_darwin-x64.txt
+            gild-cli_${{ github.ref_name }}_linux-x64.tar.gz
+            gild-cli_${{ github.ref_name }}_linux-x64.txt
+            gild-cli_${{ github.ref_name }}_windows-x64.tar.gz
+            gild-cli_${{ github.ref_name }}_windows-x64.txt
+
+  publish-linux-x64-to-npm:
+    needs: [publish-gh-release]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -274,7 +322,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-windows-x64-to-npm:
-    needs: [binary-tests]
+    needs: [publish-gh-release]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -310,7 +358,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-x64-to-npm:
-    needs: [binary-tests]
+    needs: [publish-gh-release]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -346,7 +394,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-arm64-to-npm:
-    needs: [binary-tests]
+    needs: [publish-gh-release]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
