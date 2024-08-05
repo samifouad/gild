@@ -240,10 +240,15 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-  publish-gh-release:
+  publish-gh-release-homebrew:
     needs: [binary-tests]
     runs-on: ubuntu-latest
     steps:
+      - name: install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+            bun-version: latest
+
       - name: download artifacts
         uses: actions/download-artifact@v4
 
@@ -254,26 +259,26 @@ jobs:
         run: tar -czf gild-cli_${{ github.ref_name }}_linux-x64.tar.gz gild-cli_${{ github.ref_name }}_linux-x64/gild
 
       - name: sha256 for linux-x64
-        run: shasum -a 256 gild-cli_${{ github.ref_name }}_linux-x64.tar.gz > gild-cli_${{ github.ref_name }}_linux-x64.txt
+        run: shasum -a 256 | awk '{print $1}' > gild-cli_${{ github.ref_name }}_linux-x64.tar.gz > gild-cli_${{ github.ref_name }}_linux-x64.txt
 
       - name: tarball for darwin-arm64
         run: tar -czf gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz gild-cli_${{ github.ref_name }}_darwin-arm64/gild
 
       - name: sha256 for darwin-arm64
-        run: shasum -a 256 gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz > gild-cli_${{ github.ref_name }}_darwin-arm64.txt
+        run: shasum -a 256 | awk '{print $1}' > gild-cli_${{ github.ref_name }}_darwin-arm64.tar.gz > gild-cli_${{ github.ref_name }}_darwin-arm64.txt
 
       - name: tarball for darwin-x64
         run: tar -czf gild-cli_${{ github.ref_name }}_darwin-x64.tar.gz gild-cli_${{ github.ref_name }}_darwin-x64/gild
 
       - name: sha256 for darwin-x64
-        run: shasum -a 256 gild-cli_${{ github.ref_name }}_darwin-x64.tar.gz > gild-cli_${{ github.ref_name }}_darwin-x64.txt
+        run: shasum -a 256 | awk '{print $1}' > gild-cli_${{ github.ref_name }}_darwin-x64.tar.gz > gild-cli_${{ github.ref_name }}_darwin-x64.txt
 
       - name: tarball for windows-x64
         run: tar -czf gild-cli_${{ github.ref_name }}_windows-x64.tar.gz gild-cli_${{ github.ref_name }}_windows-x64/gild.exe
 
       - name: sha256 for windows-x64
-        run: shasum -a 256 gild-cli_${{ github.ref_name }}_windows-x64.tar.gz > gild-cli_${{ github.ref_name }}_windows-x64.txt
-      
+        run: shasum -a 256 | awk '{print $1}' > gild-cli_${{ github.ref_name }}_windows-x64.tar.gz > gild-cli_${{ github.ref_name }}_windows-x64.txt
+
       - name: release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
@@ -289,10 +294,28 @@ jobs:
             gild-cli_${{ github.ref_name }}_windows-x64.tar.gz
             gild-cli_${{ github.ref_name }}_windows-x64.txt
 
-  push-to-homebrew:
-    needs: [publish-gh-release]
-    runs-on: ubuntu-latest
-    steps:
+      - name: Compute and export SHA256 hashes
+        id: compute_hashes
+        run: |
+          # Define your targets
+          targets=("linux-x64" "darwin-x64" "darwin-arm64")
+
+          # Loop through each target
+          for target in "${targets[@]}"; do
+            # Compute SHA-256 hash for each target file
+            hash=$(shasum -a 256 "gild-cli_${{ github.ref_name }}_${target}.tar.gz" | awk '{print $1}')
+            
+            # Set the environment variable
+            echo "${target^^}_SHA256=$hash" >> $GITHUB_ENV
+          done
+    
+      - name: Use SHA256 Variables
+        run: |
+          # Example of using the exported environment variables
+          echo "Linux x64 SHA256: $LINUX_X64_SHA256"
+          echo "macOS x64 SHA256: $DARWIN_X64_SHA256"
+          echo "macoS arm64 SHA256: $DARWIN_ARM64_SHA256"
+
       - name: checkout homebrew repo
         uses: actions/checkout@v4
         with:
@@ -309,8 +332,37 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Update JSON file
+        run: |
+          # Use jq to update or create JSON file
+          echo '{}' | jq \
+            --arg linux_x64_url "https://github.com/samifouad/gild-cli/releases/download/${{ github.ref_name }}/gild_cli_${{ github.ref_name }}_linux_x64.tar.gz" \
+            --arg linux_x64_hash "${{ $LINUX_X64_SHA256 }}" \
+            --arg darwin_arm64_url "https://github.com/samifouad/gild-cli/releases/download/${{ github.ref_name }}/gild_cli_${{ github.ref_name }}_darwin_arm64.tar.gz" \
+            --arg darwin_arm64_hash "${{ $DARWIN_ARM64_SHA256 }}" \
+            --arg darwin_x64_url "https://github.com/samifouad/gild-cli/releases/download/${{ github.ref_name }}/gild_cli_${{ github.ref_name }}_darwin_x64.tar.gz" \
+            --arg darwin_x64_hash "${{ $DARWIN_X64_SHA256 }}" \
+            --arg version "${{ github.ref_name }}" \
+            '. + {
+              linux_x64_url: $linux_x64_url,
+              linux_x64_hash: $linux_x64_hash,
+              darwin_arm64_url: $darwin_arm64_url,
+              darwin_arm64_hash: $darwin_arm64_hash,
+              darwin_x64_url: $darwin_x64_url,
+              darwin_x64_hash: $darwin_x64_hash
+              version: $version
+            }' > homebrew.json
+
+      - name: verify homebrew.json
+        run: |
+            cat homebrew.json
+            exit 1
+
   publish-linux-x64-to-npm:
-    needs: [push-to-homebrew]
+    needs: [publish-gh-release-homebrew]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -346,7 +398,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-windows-x64-to-npm:
-    needs: [push-to-homebrew]
+    needs: [publish-gh-release-homebrew]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -382,7 +434,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-x64-to-npm:
-    needs: [push-to-homebrew]
+    needs: [publish-gh-release-homebrew]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -418,7 +470,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-darwin-arm64-to-npm:
-    needs: [push-to-homebrew]
+    needs: [publish-gh-release-homebrew]
     runs-on: ubuntu-latest      
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
