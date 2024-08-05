@@ -18,7 +18,7 @@ jobs:
         id: get_sha
         run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      - name: Debug: Print branches containing commit
+      - name: Debug - Print branches containing commit
         run: |
           echo "Commit SHA: ${{ env.COMMIT_SHA }}"
           git branch --contains ${{ env.COMMIT_SHA }}
