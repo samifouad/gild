@@ -43,3 +43,5 @@ there is a **/core** folder that contains every command in it's own subfolder. e
 once code hits the main branch and a new tag is generated, gild will be eventually deployed to **npm**, **homebrew** and **scoop**. as of right now, npm is fully integrated. homebrew works manually and scoop support is coming soon.
 
 for people who do not wish to use any of these package managers, a standalone file will be made available on the [gild.gg](https://gild.gg) website directly.
+
+every new tag also generates a github release. the release will contain all binaries for all platforms.
