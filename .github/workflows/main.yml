@@ -8,6 +8,7 @@ on:
 jobs:
   verify-and-run:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,22 +19,17 @@ jobs:
         id: get_sha
         run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      - name: Debug - Print branches containing commit
-        run: |
-          echo "Commit SHA: ${{ env.COMMIT_SHA }}"
-          git branch --contains ${{ env.COMMIT_SHA }}
+      - name: Debug - Print commit SHA
+        run: echo "Commit SHA - ${{ env.COMMIT_SHA }}"
 
       - name: Check if commit is on main
         id: check_main
         run: |
-          # Get the current branch name
-          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          # Fetch all branches to ensure we have the latest references
+          git fetch origin
 
-          # Debug: Print the current branch name
-          echo "Current branch: $current_branch"
-
-          # Check if the current branch is main
-          if [[ "$current_branch" == "main" ]]; then
+          # Check if the commit is in the main branch history
+          if git merge-base --is-ancestor ${{ env.COMMIT_SHA }} origin/main; then
             echo "COMMIT_ON_MAIN=true" >> $GITHUB_ENV
           else
             echo "COMMIT_ON_MAIN=false" >> $GITHUB_ENV
