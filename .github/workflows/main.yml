@@ -370,6 +370,14 @@ jobs:
         run: |
             bun run homebrew.ts
             cat homebrew-gild/Formula/gild.rb
+
+      - name: push changes to homebrew repo
+        run: |
+            cd homebrew-gild
+            git add .
+            git commit -m 'automated version bump'
+            git tag ${{ github.ref_name }} -m 'automated version bump'
+            git push
       
       - name: stop action
         run: |
