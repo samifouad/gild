@@ -213,7 +213,7 @@ jobs:
           npm link
 
       - name: install gild via npm
-        run: npm install @samifouad/gild
+        run: npm install -g @samifouad/gild
 
       - name: Display structure of files + npm
         run: |
