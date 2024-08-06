@@ -215,6 +215,11 @@ jobs:
       - name: install gild via npm
         run: npm install @samifouad/gild
 
+      - name: Display structure of files + npm
+        run: |
+          ls -R
+          npm list @samifouad/gild
+
       - name: sanity check
         run: gild check
 
