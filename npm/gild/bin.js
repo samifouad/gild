@@ -4,18 +4,16 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
-let binaryPath;
-
-// Determine if the script is running from a global installation or a local one
-const isGlobalInstall = path.dirname(require.main.filename).includes('node_modules');
-
-try {
+function findBinaryPath() {
+    // Determine if the script is being run globally or locally
+    const isGlobalInstall = path.dirname(require.main.filename).includes('node_modules');
     let npmRoot;
+
     if (isGlobalInstall) {
-        // Global install path
-        npmRoot = execSync("npm root -g").toString().trim();
+        // Global installation path
+        npmRoot = execSync('npm root -g').toString().trim();
     } else {
-        // Local install path
+        // Local installation path
         npmRoot = path.dirname(require.main.filename);
     }
 
@@ -32,19 +30,17 @@ try {
             : 'gild-darwin-arm64'
         : '';
 
-    binaryPath = path.join(npmRoot, 'node_modules', '@samifouad', binaryFolder, binaryName);
+    const binaryPath = path.join(npmRoot, 'node_modules', '@samifouad', binaryFolder, binaryName);
 
     console.log(`Binary Path: ${binaryPath}`);
 
-    // Check if the binary exists before trying to execute it
-    if (!fs.existsSync(binaryPath)) {
-        console.error(`Binary not found: ${binaryPath}`);
-        process.exit(1);
+    if (fs.existsSync(binaryPath)) {
+        return binaryPath;
     }
 
-    // Execute the binary with any arguments passed to the script
-    execSync(`"${binaryPath}" ${process.argv.slice(2).join(' ')}`, { stdio: 'inherit' });
-} catch (error) {
-    console.error('Error:', error.message);
+    console.error(`Binary not found: ${binaryPath}`);
     process.exit(1);
 }
+
+const binaryPath = findBinaryPath();
+execSync(`"${binaryPath}" ${process.argv.slice(2).join(' ')}`, { stdio: 'inherit' });
