@@ -391,8 +391,8 @@ jobs:
             git config --global user.signingkey /tmp/id_rsa
             git add .
             git commit -m 'automated version bump'
-            git tag ${{ github.ref_name }} -m 'automated version bump'
-            git push
+            git tag ${{ github.ref_name }} -m 'automated version bump to ${{ github.ref_name }}'
+            git push --follow-tags
       
       - name: stop action
         run: |
