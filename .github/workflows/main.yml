@@ -201,8 +201,8 @@ jobs:
       - name: Prepare linux-x64's package.json and copy binary artifact
         shell: bash
         run: |
-          jq ". + {version: \"${{ env.CURRENT_TAG }}\"}" gild-cli/npm/gild-linux-x64/package.json > gild-cli/npm/gild-linux-x64/package.tmp.json && mv gild-cli/npm/gild-linux-x64/package.tmp.json gild-cli/npm/gild-linux-x64/package.json
-          cp ./gild-cli_${{ env.CURRENT_TAG }}_linux-x64/gild gild-cli/npm/gild-linux-x64/gild
+          jq ". + {version: \"${{ github.ref_name }}\"}" gild-cli/npm/gild-linux-x64/package.json > gild-cli/npm/gild-linux-x64/package.tmp.json && mv gild-cli/npm/gild-linux-x64/package.tmp.json gild-cli/npm/gild-linux-x64/package.json
+          cp ./gild-cli_${{ github.ref_name }}_linux-x64/gild gild-cli/npm/gild-linux-x64/gild
 
       - name: Display structure of downloaded files
         run: ls -R
