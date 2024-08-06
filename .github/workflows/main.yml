@@ -360,6 +360,19 @@ jobs:
       - name: verify homebrew.json
         run: |
             cat homebrew.json
+
+      - name: move homebrew.ts
+        run: |
+            mv gild-cli/homebrew.ts homebrew.ts
+            ls -R
+
+      - name: run homebrew.ts & print output
+        run: |
+            bun run homebrew.ts
+            cat homebrew-gild/Formula/gild.rb
+      
+      - name: stop action
+        run: |
             exit 1
 
   publish-linux-x64-to-npm:

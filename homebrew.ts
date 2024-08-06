@@ -40,7 +40,7 @@ end
 `;
 
 // Define the output file name
-const outputFileName = 'Formula/gild.rb';
+const outputFileName = 'homebrew-gild/Formula/gild.rb';
 
 // Write the generated content to a Ruby file
 fs.writeFileSync(outputFileName, rubyFileContent);
