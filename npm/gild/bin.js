@@ -19,6 +19,8 @@ try {
         npmRoot = path.dirname(require.main.filename);
     }
 
+    console.log(`npmRoot: ${npmRoot}`);
+
     const binaryName = os.platform() === 'win32' ? 'gild.exe' : 'gild';
 
     switch (os.platform()) {
@@ -37,6 +39,8 @@ try {
             console.error(`Unsupported platform: ${os.platform()}`);
             process.exit(1);
     }
+
+    console.log(`Binary Path: ${binaryPath}`);
 
     // Check if the binary exists before trying to execute it
     if (!fs.existsSync(binaryPath)) {
