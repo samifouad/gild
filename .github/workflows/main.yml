@@ -386,6 +386,8 @@ jobs:
             git config --global user.email "sfouad@gmail.com"
             git config --global user.name "Sami Fouad"
             git config --global gpg.format ssh
+            git config --global commit.gpgsign true
+            git config --global tag.gpgSign true
             git config --global user.signingkey /tmp/id_rsa
             git add .
             git commit -m 'automated version bump'
