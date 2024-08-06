@@ -18,7 +18,7 @@ const rubyFileContent = `class Gild < Formula
   desc "Infrastructure as code"
   homepage "https://gild.gg"
   version "${c.version}"
-  license "Apache2.0"
+  license "Apache-2.0"
 
   if OS.mac?
     if Hardware::CPU.intel?

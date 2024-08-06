@@ -371,11 +371,22 @@ jobs:
             bun run homebrew.ts
             cat homebrew-gild/Formula/gild.rb
 
+      - name: Set up SSH
+        env:
+          RSA_PRIVATE_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          echo "$RSA_PRIVATE_KEY" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add /tmp/id_rsa
+
       - name: push changes to homebrew repo
         run: |
             cd homebrew-gild
             git config --global user.email "sfouad@gmail.com"
             git config --global user.name "Sami Fouad"
+            git config --global gpg.format ssh
+            git config --global user.signingkey /tmp/id_rsa
             git add .
             git commit -m 'automated version bump'
             git tag ${{ github.ref_name }} -m 'automated version bump'
