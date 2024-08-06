@@ -22,23 +22,17 @@ try {
     console.log(`npmRoot: ${npmRoot}`);
 
     const binaryName = os.platform() === 'win32' ? 'gild.exe' : 'gild';
+    const binaryFolder = os.platform() === 'win32'
+        ? 'gild-windows-x64'
+        : os.platform() === 'linux'
+        ? 'gild-linux-x64'
+        : os.platform() === 'darwin'
+        ? os.arch() === 'x64'
+            ? 'gild-darwin-x64'
+            : 'gild-darwin-arm64'
+        : '';
 
-    switch (os.platform()) {
-        case 'darwin':
-            binaryPath = os.arch() === 'x64'
-                ? path.join(npmRoot, 'gild', 'node_modules', '@samifouad', 'gild-darwin-x64', binaryName)
-                : path.join(npmRoot, 'gild', 'node_modules', '@samifouad', 'gild-darwin-arm64', binaryName);
-            break;
-        case 'win32':
-            binaryPath = path.join(npmRoot, 'gild', 'node_modules', '@samifouad', 'gild-windows-x64', binaryName);
-            break;
-        case 'linux':
-            binaryPath = path.join(npmRoot, 'gild', 'node_modules', '@samifouad', 'gild-linux-x64', binaryName);
-            break;
-        default:
-            console.error(`Unsupported platform: ${os.platform()}`);
-            process.exit(1);
-    }
+    binaryPath = path.join(npmRoot, 'node_modules', '@samifouad', binaryFolder, binaryName);
 
     console.log(`Binary Path: ${binaryPath}`);
 
