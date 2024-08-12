@@ -1,6 +1,6 @@
 # gild-cli
 
-documentation coming soon to [gild.gg](https://gild.gg)
+documentation coming soon
 
 ## installation
 install with [npm](https://npmjs.com): ```npm install -g @samifouad/gild```
