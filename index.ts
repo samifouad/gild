@@ -11,21 +11,30 @@ program
   
 program
     .command('new')
-    .description('create a new .gild folder')
+    .description('create a new gild project')
     .action(async () => {
         await core.init()
     })
 
 program
+    .command('add')
+    .description('fetch remote package')
+    .argument('<repo>', 'github <user>/<repo> containing a package')
+    .argument('[version]', 'requested version for package, default is latest')
+    .action(async (repo, version) => {
+        await core.add(repo, version)
+    })
+
+program
     .command('status')
-    .description('check current configuration')
+    .description('sanity check current project')
     .action(async () => {
         await core.status()
     })
 
 program
     .command('check')
-    .description('sanity check for current system')
+    .description('sanity check your system')
     .action(async () => {
         await core.check()
     })

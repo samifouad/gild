@@ -4,7 +4,7 @@ import { check_existing } from './lib/check_existing'
 import { create_directory } from './lib/create_directory'
 import { create_file } from './lib/create_file'
 
-export async function init() {
+export async function init() { // can't use "new" as it's a reserved word
     const spinner = createSpinner('task: create .gild folder').start();
 
     // check for existing folder
