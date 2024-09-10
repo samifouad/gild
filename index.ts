@@ -46,4 +46,11 @@ program
         console.log('get')
     })
 
+program
+    .command('login')
+    .description('authenticate with fromafri.ca')
+    .action(async () => {
+        await core.login()
+    })
+
 program.parse()

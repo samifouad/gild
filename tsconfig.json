@@ -11,7 +11,9 @@
     // imports
     "paths": {
       "@/core": ["./core/index.ts"],
-      "@/*": ["./core/*"]
+      "@/*": ["./core/*"],
+      "!/utils": ["./utils/index.ts"],
+      "#/*": ["./*"]
     },
 
     // Bundler mode
