@@ -1,8 +1,9 @@
 import { sleep, serve, $ } from 'bun'
 import { createSpinner } from 'nanospinner'
-import data from '#/package.json' with { type: 'json' }
-import { sysinfo } from '!/utils'
+import data from '@/package.json' with { type: 'json' }
+import { sysinfo } from '@/utils'
 import base64url from 'base64url'
+import type { Kv } from '../types/type'
 
 export async function login() {
     let spinner = createSpinner(' task: initiate login flow for fromafri.ca').start();
@@ -55,19 +56,19 @@ export async function login() {
         },
     });
 
-    let params = [
+    let params: Kv = [
         { client: `${data.name}_v${data.version}`},
         { redirect_uri: `http://localhost:${port}/callback`},
         { response_type: 'code'},
-    ]
+    ] satisfies Kv
 
     const client_info = await sysinfo()
 
     params.push(...client_info)
 
-    params = await base64url(JSON.stringify(params))
+    let final = await base64url(JSON.stringify(params))
 
-    const authUrl = `http://localhost:3000/cli?a=${params}`;
+    const authUrl = `https://fromafri.ca/cli?a=${final}`;
 
     spinner.success();
 

@@ -8,12 +8,13 @@
     "jsx": "react-jsx",
     "allowJs": true,
 
+    "baseUrl": ".",
+
     // imports
     "paths": {
       "@/core": ["./core/index.ts"],
-      "@/*": ["./core/*"],
-      "!/utils": ["./utils/index.ts"],
-      "#/*": ["./*"]
+      "@/utils": ["./utils/index.ts"],
+      "@/*": ["./*"]
     },
 
     // Bundler mode
@@ -31,5 +32,13 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  }
+  },
+  "include": [
+    "./type/**/*.ts", // custom types
+    "./types/**/*.d.ts",
+    "./core/**/*.ts" // inputs
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

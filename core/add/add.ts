@@ -2,7 +2,7 @@ import { $ } from 'bun'
 import { createSpinner } from 'nanospinner'
 import { sleep } from '@/core'
 
-export async function add(repo, version) {
+export async function add(repo: string, version: string) {
     const spinner = createSpinner(' task: add remote package').start();
 
     await sleep(1000)
@@ -25,7 +25,7 @@ export async function add(repo, version) {
 
     if (source !== undefined && pkg === undefined) {
         pkg = user
-        user = undefined
+        user = ''
     }
     console.log('user: '+ user)
     console.log('pkg: '+ pkg)

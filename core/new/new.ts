@@ -8,7 +8,7 @@ export async function init() { // can't use "new" as it's a reserved word
     const spinner = createSpinner('task: create .gild folder').start();
 
     // check for existing folder
-    const { exitCode: gf_exitCode } = await check_existing('.gild')
+    const { exitCode: gf_exitCode } = await check_existing(process.platform, '.gild')
 
     if (gf_exitCode === 0) {
         spinner.error()
