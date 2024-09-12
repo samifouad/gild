@@ -1,9 +1,8 @@
 import { expect, test, describe, beforeAll } from 'bun:test'
 import { $ } from 'bun'
-import os from 'node:os'
-import { check_existing } from './lib/check_existing'
-import { create_directory } from './lib/create_directory'
-import { create_file } from './lib/create_file'
+import { check_existing } from '@/utils/check_existing'
+import { create_directory } from '@/utils/create_directory'
+import { create_file } from '@/utils/create_file'
 
 describe("command: new", () => {
     beforeAll(async () => {

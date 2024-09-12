@@ -1,8 +1,7 @@
-import { $ } from 'bun'
 import { createSpinner } from 'nanospinner'
-import { check_existing } from './lib/check_existing'
-import { create_directory } from './lib/create_directory'
-import { create_file } from './lib/create_file'
+import { check_existing } from '@/utils/check_existing'
+import { create_directory } from '@/utils/create_directory'
+import { create_file } from '@/utils/create_file'
 
 export async function init() { // can't use "new" as it's a reserved word
     const spinner = createSpinner('task: create .gild folder').start();

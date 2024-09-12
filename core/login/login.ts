@@ -1,4 +1,4 @@
-import { sleep, serve, $ } from 'bun'
+import { serve, $ } from 'bun'
 import { createSpinner } from 'nanospinner'
 import data from '@/package.json' with { type: 'json' }
 import { sysinfo } from '@/utils'
@@ -24,7 +24,9 @@ export async function login() {
                     spinner2.success({ text: `Received OAuth code: ${authCode}`})
                     isAuthorized = true;
                     // Send the response
-                    const response = new Response("Login successful! You can close this window.");
+                    // TODO: make this page look less boring
+                    // it's just a blank page with 1 line of text
+                    const response = new Response("login successful! you can close this window.");
                     
                     // Allow some time for the response to be sent
                     setTimeout(() => {
@@ -50,9 +52,12 @@ export async function login() {
                 
             }
 
-            return new Response("Not Found", { status: 404 });
-            server.stop(); // Stop the server 
-            process.exit(1); // Exit with failure code
+            const response = new Response("Not Found", { status: 404 });
+            setTimeout(() => {
+                server.stop(); // Stop the server 
+                process.exit(1); // Exit with failure code
+            }, 100); // Adjust the delay as needed
+            return response;
         },
     });
 

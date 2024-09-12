@@ -1,4 +1,3 @@
-import { $ } from 'bun'
 import { createSpinner } from 'nanospinner'
 import { sleep } from '@/core'
 
