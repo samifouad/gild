@@ -1,114 +1,117 @@
-import { serve, $ } from 'bun'
+import { $ } from 'bun'
+import crypto from 'node:crypto'
 import { createSpinner } from 'nanospinner'
 import data from '@/package.json' with { type: 'json' }
 import { sysinfo } from '@/utils'
-import base64url from 'base64url'
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 import type { Kv } from '../types/type'
 
 export async function login() {
     let spinner = createSpinner(' task: initiate login flow for fromafri.ca').start();
 
-    const port = 55555;
-    let isAuthorized = false;
-
-    // Start the local server to handle the OAuth redirect
-    const server = serve({
-        port: port,
-        async fetch(req) {
-            const url = new URL(req.url);
-            const params = new URLSearchParams(url.search);
-
-            if (url.pathname === '/callback') {
-                const authCode = params.get('code');
-                if (authCode) {
-                    spinner2.success({ text: `Received OAuth code: ${authCode}`})
-                    isAuthorized = true;
-                    // Send the response
-                    // TODO: make this page look less boring
-                    // it's just a blank page with 1 line of text
-                    const response = new Response("login successful! you can close this window.");
-                    
-                    // Allow some time for the response to be sent
-                    setTimeout(() => {
-                        server.stop(); // Stop the server 
-                        process.exit(0); // Exit
-                    }, 100); // Adjust the delay as needed
-                    
-                    return response;
-                    
-                } else {
-                     // Send the response
-                    const response = new Response("No OAuth code received.");
-                    
-                    // Allow some time for the response to be sent
-                    setTimeout(() => {
-                        server.stop(); // Stop the server 
-                        process.exit(1); // Exit with failure code
-                    }, 100); // Adjust the delay as needed
-                    
-                    return response;
-                }
-
-                
-            }
-
-            const response = new Response("Not Found", { status: 404 });
-            setTimeout(() => {
-                server.stop(); // Stop the server 
-                process.exit(1); // Exit with failure code
-            }, 100); // Adjust the delay as needed
-            return response;
-        },
-    });
-
-    let params: Kv = [
-        { client: `${data.name}_v${data.version}`},
-        { redirect_uri: `http://localhost:${port}/callback`},
-        { response_type: 'code'},
+    let metadata: Kv = [
+        { client: `${data.name}_v${data.version}`}
     ] satisfies Kv
 
     const client_info = await sysinfo()
 
-    params.push(...client_info)
+    metadata.push(...client_info)
 
-    let final = await base64url(JSON.stringify(params))
+    const device_code = generateDeviceCode()
 
-    const authUrl = `https://fromafri.ca/cli?a=${final}`;
+    let user_code
 
-    spinner.success();
-
-    let browser_spinner = createSpinner(' task: launch browser').start();
-
-    // Attempt to open the browser
     try {
-        if (process.platform === 'win32') {
-            await $`start ${authUrl}`.quiet();
-            browser_spinner.success();
-        } else if (process.platform === 'darwin') {
-            await $`open ${authUrl}`.quiet();
-            browser_spinner.success();
-        } else if (process.platform === 'linux') {
-            await $`xdg-open ${authUrl}`.quiet();
-            browser_spinner.success();
+        const response = await fetch('https://fromafri.ca/device', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ device_code, 'metadata': metadata })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.userCode !== undefined)
+                user_code = data.userCode
+
+            spinner.success();
         } else {
-            throw new Error('unsupported platform');
+            throw 'error initiating device flow'
         }
     } catch (error) {
-        console.log('\nautomatic browser launch failed');
-        browser_spinner.error({ text: 'Browser launch failed' });
+        spinner.error({ text: 'Login failed: '+ error });
+        process.exit(1); // Exit with failure code
     }
 
-    console.log(`\nyou can use this URL if your browser didn't open:\n\n${authUrl}`);
+    console.log(`\nnavigate to: https://fromafri.ca/cli`);
+    console.log('\n');
+    console.log('enter this code: '+ user_code)
     console.log('\n');
 
     let spinner2 = createSpinner(' task: waiting for login...').start();
 
-    // Set a timeout for 15 seconds (15000 ms)
-    const timeout = setTimeout(() => {
-        if (!isAuthorized) {
-            server.stop(); // Stop the server on timeout
+    let auth_token = '';
+    let checkInterval: any // Variable to hold the interval ID
+
+    // Function to check the token
+    async function checkToken() {
+        try {
+            const response = await fetch('https:fromafri.ca/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ device_code })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.token !== undefined) {
+                    auth_token = data.token;
+                    spinner2
+                    spinner2.success();
+                    clearInterval(checkInterval); // Stop polling once the token is received
+                    saveToken(auth_token)
+                    process.exit(0); // Exit with success code
+                }
+            } else {
+                throw new Error('Error initiating device flow');
+            }
+        } catch (error) {
+            spinner.error({ text: 'Login failed: ' + error });
+            clearInterval(checkInterval); // Stop polling on error
+            process.exit(1); // Exit with failure code
+        }
+    }
+
+    // Start polling every 3 seconds
+    checkInterval = setInterval(checkToken, 3000);
+
+    // Limit of 60 seconds for this process
+    setTimeout(() => {
+        clearInterval(checkInterval); // Stop polling
+        if (auth_token === '') {
             spinner2.error({ text: 'Login failed: timeout' });
             process.exit(1); // Exit with failure code
         }
-    }, 30000);
+    }, 60000);
+}
+
+// Function to generate a secure `device_code`
+function generateDeviceCode(length = 32) {
+  return crypto.randomBytes(length).toString('hex'); // Generate a hexadecimal string
+}
+
+function saveToken(token) {
+    const homeDir = os.homedir(); // Get user's home directory
+    const dirPath = path.join(homeDir, '.fromafrica'); // ~/.fromafrica
+    const filePath = path.join(dirPath, 'auth.json'); // ~/.fromafrica/auth.json
+
+    // Check if directory exists, if not, create it
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Save the token to auth.json
+    const tokenData = { token };
+    fs.writeFileSync(filePath, JSON.stringify(tokenData, null, 2));
 }
