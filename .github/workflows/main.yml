@@ -426,9 +426,9 @@ jobs:
             git tag ${{ github.ref_name }} -m 'automated version bump to ${{ github.ref_name }}'
             git push --follow-tags
       
-      - name: stop action
-        run: |
-            exit 1
+      # - name: stop action
+      #   run: |
+      #       exit 1
 
   publish-linux-x64-to-npm:
     needs: [publish-gh-release-homebrew]
